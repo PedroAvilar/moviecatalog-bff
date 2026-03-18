@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import movieRoutes from './routes/movie.route.js';
+import connectDB from './config/db.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+connectDB();
 
 app.use(cors({
     origin: 'http://localhost:5173',
