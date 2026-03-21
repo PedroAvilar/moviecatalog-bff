@@ -5,7 +5,8 @@ import cors from 'cors';
 import movieRoutes from './routes/movie.route.js';
 import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/auth.route.js'
+import authRoutes from './routes/auth.route.js';
+import reviewRoutes from './routes/review.route.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +25,8 @@ app.use(cookieParser());
 app.use('/api/movie', movieRoutes);
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api/review', reviewRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ 
