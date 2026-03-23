@@ -1,5 +1,6 @@
 import express from 'express';
 import tmdb from '../services/tmdb.service.js';
+import { getMovieDetails } from '../controllers/movie.controller.js';
 
 const router = express.Router();
 
@@ -12,5 +13,7 @@ router.get('/popular', async (req, res) => {
         res.status(error.response?.status || 500).json({ error: 'Erro ao buscar filmes do TMDB' });
     }
 });
+
+router.get('/:id/details', getMovieDetails);
 
 export default router;
