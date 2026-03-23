@@ -30,4 +30,13 @@ reviewSchema.index(
     { unique: true }
 );
 
+reviewSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
+
 export default mongoose.model('Review', reviewSchema);
