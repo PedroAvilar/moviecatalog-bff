@@ -24,6 +24,32 @@ router.get('/top_rated', async (req, res) => {
     }
 });
 
+router.get('/genres', async (req,res) => {
+    try {
+        const response = await tmdb.get('/genre/movie/list');
+        res.json(response.data);
+    } catch (error) {
+        console.error("Erro TMDB Genres: ", error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({ error: 'Erro ao buscar lista de gêneros no TMDB'});
+    }
+});
+
+router.get('/discover', async (req, res) => {
+    try {
+        const { with_genres, page } = req.query;
+        const response = await tmdb.get('/discover/movie', {
+            params: {
+                with_genres,
+                page: page || 1
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Erro TMDB Discover: ", error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({ error: 'Erro ao filtrar filmes por gênero'})
+    }
+})
+
 router.get('/:id/details', getMovieDetails);
 
 export default router;
