@@ -78,3 +78,30 @@ export const deleteReview = async (req, res) => {
         res.status(500).json({ error: 'Erro ao remover avaliação' });
     }
 };
+
+export const updateReview = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rating, comment } = req.body;
+        const userId = req.user.id;
+
+        if (!rating || !comment) {
+            return res.status(400).json({ error: 'Dados insuficientes para atualização' });
+        }
+
+        const review = await Review.findOneAndUpdate(
+            { _id: id, userId },
+            { rating, comment },
+            { new: true, runValidators: true }
+        );
+
+        if (!review) {
+            return res.status(404).json({ error: 'Avaliação não encontrada ou sem permissão' });
+        }
+
+        res.json(review);
+    } catch (error) {
+        console.error('Erro ao atualizar avaliação:', error);
+        res.status(500).json({ error: 'Erro ao atualizar avaliação' });
+    }
+};
