@@ -1,4 +1,5 @@
 import Review from '../models/review.model.js';
+import tmdb from '../services/tmdb.service.js';
 
 export const createReview = async (req, res) => {
     try {
@@ -30,8 +31,50 @@ export const createReview = async (req, res) => {
 export const getMyReviews = async (req, res) => {
     try {
         const reviews = await Review.find({ userId: req.user.id }).sort('-createdAt');
-        res.json(reviews);
+
+        const reviewsWithDetails = await Promise.all(
+            reviews.map(async (review) => {
+                try {
+                    const response = await tmdb.get(`/movie/${review.movieId}`);
+                    const movieData = response.data;
+                    const reviewJson = review.toJSON();
+                    
+                    return {
+                        ...reviewJson,
+                        movieId: {
+                            id: review.movieId,
+                            title: movieData.title,
+                            poster_path: movieData.poster_path,
+                            release_date: movieData.release_date
+                        }
+                    };
+                } catch (error) {
+                    return {
+                        ...review.toJSON(),
+                        movieId: { id: review.movieId, title: 'Filme não encontrado'}
+                    };
+                }
+            })
+        );
+        res.json(reviewsWithDetails);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar suas avaliações'})
+    }
+};
+
+export const deleteReview = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const review = await Review.findOneAndDelete({ _id: id, userId });
+
+        if (!review) {
+            return res.status(404).json({ error: 'Avaliação não encontrada ou sem permissão' });
+        }
+
+        res.json({ message: 'Avaliação removida com sucesso' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao remover avaliação' });
     }
 };
