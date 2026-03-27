@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
+import Review from '../models/review.model.js';
 
 const secureProduction = process.env.NODE_ENV === 'production';
 const sameSiteProduction = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
@@ -74,6 +75,64 @@ export const login = async (req, res) => {
     } catch (error) {
         console.error('Erro no login: ', error);
         res.status(500).json({ error: 'Erro ao realizar login' })
+    }
+};
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+        if (name) user.name = name;
+        if (email) user.email = email;
+
+        await user.save();
+
+        res.json({
+            message: 'Perfil atualizado com sucesso',
+            user: { id: user._id, name: user.name, email: user.email }
+        });
+    } catch (error) {
+        if (error.code === 11000) return res.status(400).json({ error: 'E-mail já está em uso' });
+        res.status(500).json({ error: 'Erro ao atualizar perfil' });
+    }
+};
+
+export const updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.id).select('+password');
+
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) return res.status(401).json({ error: 'Senha atual incorreta' });
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Senha atualizada com sucesso' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao atualizar senha' });
+    }
+};
+
+export const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        await Review.deleteMany({ userId });
+        await User.findByIdAndDelete(userId);
+
+        res.clearCookie('token', {
+            httpOnly: true,
+            sameSite: sameSiteProduction,
+            secure: secureProduction
+        });
+
+        res.json({ message: 'Conta e avaliações excluídas com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir conta:', error);
+        res.status(500).json({ error: 'Erro ao excluir conta e dados associados' });
     }
 };
 
