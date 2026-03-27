@@ -17,8 +17,7 @@ export const createReview = async (req, res) => {
             comment
         });
 
-        res.status(201).json(review);
-
+        res.json({ message: 'Avaliação criada com sucesso' });
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({ error: 'Você já avaliou esse filme' });
@@ -99,7 +98,7 @@ export const updateReview = async (req, res) => {
             return res.status(404).json({ error: 'Avaliação não encontrada ou sem permissão' });
         }
 
-        res.json(review);
+        res.json({ message: 'Avaliação alterada com sucesso' });
     } catch (error) {
         console.error('Erro ao atualizar avaliação:', error);
         res.status(500).json({ error: 'Erro ao atualizar avaliação' });
