@@ -85,6 +85,10 @@ export const updateProfile = async (req, res) => {
 
         if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
+        if (!name || !email) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios'})
+        }
+
         if (name) user.name = name;
         if (email) user.email = email;
 
