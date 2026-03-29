@@ -6,7 +6,7 @@ export const createReview = async (req, res) => {
         const { movieId, rating, comment } = req.body;
         const userId = req.user.id;
 
-        if (!movieId || !rating || !userId || !comment) {
+        if (!movieId || typeof rating !== 'number' || !userId || !comment) {
             return res.status(400).json({ error: 'Avaliação inválida'})
         }
 
@@ -84,7 +84,7 @@ export const updateReview = async (req, res) => {
         const { rating, comment } = req.body;
         const userId = req.user.id;
 
-        if (!rating || !comment) {
+        if (typeof rating !== 'number' || !comment) {
             return res.status(400).json({ error: 'Dados insuficientes para atualização' });
         }
 
