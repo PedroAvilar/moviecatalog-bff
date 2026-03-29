@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.route.js';
 import reviewRoutes from './routes/review.route.js';
+import favoriteRoutes from './routes/favorite.route.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,8 @@ app.use('/api/movie', movieRoutes);
 app.use('/api/auth', authRoutes);
 
 app.use('/api/review', reviewRoutes);
+
+app.use('/api/favorite', favoriteRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ 
