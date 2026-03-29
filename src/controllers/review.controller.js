@@ -10,7 +10,7 @@ export const createReview = async (req, res) => {
             return res.status(400).json({ error: 'Avaliação inválida'})
         }
 
-        const review = await Review.create({
+        await Review.create({
             movieId,
             userId,
             rating,
