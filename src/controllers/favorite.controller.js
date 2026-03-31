@@ -30,8 +30,11 @@ export const getFavorites = async (req, res) => {
         const favorites = await Favorite.find({ userId: req.user.id }).sort({ createdAt: -1 });
 
         const formattedFavorites = favorites.map(fav => ({
-            ...fav._doc,
-            id: fav.movieId
+            id: fav.movieId,
+            title: fav.title,
+            poster_path: fav.poster_path,
+            vote_average: fav.vote_average,
+            createdAt: fav.createdAt
         }));
         res.json(formattedFavorites);
     } catch (error) {
