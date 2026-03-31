@@ -33,14 +33,15 @@ export const getMyReviews = async (req, res) => {
 
         const reviewsWithDetails = await Promise.all(
             reviews.map(async (review) => {
+                const reviewJson = review.toJSON();
                 try {
                     const response = await tmdb.get(`/movie/${review.movieId}`);
                     const movieData = response.data;
-                    const reviewJson = review.toJSON();
+                    delete reviewJson.movieId;
                     
                     return {
                         ...reviewJson,
-                        movieId: {
+                        movie: {
                             id: review.movieId,
                             title: movieData.title,
                             poster_path: movieData.poster_path,
@@ -48,9 +49,10 @@ export const getMyReviews = async (req, res) => {
                         }
                     };
                 } catch (error) {
+                    delete reviewJson.movieId;
                     return {
-                        ...review.toJSON(),
-                        movieId: { id: review.movieId, title: 'Filme não encontrado'}
+                        ...reviewJson,
+                        movie: { id: review.movieId, title: 'Filme não encontrado'}
                     };
                 }
             })
