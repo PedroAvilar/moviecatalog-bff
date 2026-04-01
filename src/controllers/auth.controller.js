@@ -45,13 +45,8 @@ export const login = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email }).select('+password');
 
-    if (!user) {
-        throw new AppError('E-mail não cadastrado', 400);
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-        throw new AppError('Senha inválida', 400);
+    if (!user || !(await user.comparePassword(password))) {
+        throw new AppError('E-mail ou senha inválidos', 401);
     }
 
     const token = jwt.sign(
@@ -115,7 +110,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
     }
 
     const isMatch = await user.comparePassword(currentPassword);
-    
+
     if (!isMatch){
         throw new AppError('Senha atual incorreta', 401);
     }
