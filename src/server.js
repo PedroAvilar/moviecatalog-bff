@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.route.js';
 import reviewRoutes from './routes/review.route.js';
 import favoriteRoutes from './routes/favorite.route.js';
 import env from './config/env.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 const app = express();
 
@@ -41,6 +42,8 @@ app.use((req, res) => {
         error: 'Rota não encontrada'
     })
 })
+
+app.use(errorHandler);
 
 app.listen(env.port, () => {
     console.log(`Servidor BFF rodando em http://localhost:${env.port}`)
