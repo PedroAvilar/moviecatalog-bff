@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import movieRoutes from './routes/movie.route.js';
@@ -8,14 +6,14 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.route.js';
 import reviewRoutes from './routes/review.route.js';
 import favoriteRoutes from './routes/favorite.route.js';
+import env from './config/env.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 connectDB();
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://pedroavilar.github.io'],
+    origin: env.corsOrigins,
     credentials: true
 }));
 
@@ -44,6 +42,6 @@ app.use((req, res) => {
     })
 })
 
-app.listen(PORT, () => {
-    console.log(`Servidor BFF rodando em http://localhost:${PORT}`)
+app.listen(env.port, () => {
+    console.log(`Servidor BFF rodando em http://localhost:${env.port}`)
 })

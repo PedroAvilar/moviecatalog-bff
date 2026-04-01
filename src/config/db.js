@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
+import env from './env.js';
 
 const connectDB = async () => {
     try {
-        const mongoURI = process.env.MONGO_URI || 'mongodb://mongo:27017/moviecatalog';
-
-        const conn = await mongoose.connect(mongoURI);
-
+        const conn = await mongoose.connect(env.mongoUri);
         console.log(`MongoDB conectado em ${conn.connection.host}:${conn.connection.port}`)
     } catch (error) {
         console.error(`Erro ao conectar ao MongoDB: ${error.message}`);

@@ -1,9 +1,10 @@
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import Review from '../models/review.model.js';
+import env from '../config/env.js';
 
-const secureProduction = process.env.NODE_ENV === 'production';
-const sameSiteProduction = process.env.NODE_ENV === 'production' ? 'none' : 'strict';
+const secureProduction = env.isProduction;
+const sameSiteProduction = env.isProduction ? 'none' : 'strict';
 
 export const register = async (req, res) => {
     try {
@@ -53,7 +54,7 @@ export const login = async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id },
-            process.env.JWT_SECRET,
+            env.jwtSecret,
             { expiresIn: '1d' }
         );
 
