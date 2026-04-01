@@ -1,6 +1,6 @@
 import Favorite from '../models/favorite.model.js';
 
-export const toogleFavorite = async (req, res) => {
+export const toggleFavorite = async (req, res) => {
     try {
         const { movieId, title, poster_path, vote_average } = req.body;
         const userId = req.user.id;
@@ -21,7 +21,7 @@ export const toogleFavorite = async (req, res) => {
         await newFavorite.save();
         res.status(201).json({ message: 'Adicionado aos favoritos', isFavorite: true });
     } catch (error) {
-        res.status(500).json({ messag: 'Erro ao processar favorito' });
+        res.status(500).json({ message: 'Erro ao processar favorito' });
     }
 };
 
