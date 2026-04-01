@@ -22,6 +22,12 @@ By offloading these responsibilities from the client side, the frontend can rema
 - [MongoDB](https://www.mongodb.com/) (Mongoose)
 - [JWT](https://jwt.io/) (JSON Web Tokens)
 - [Docker](https://www.docker.com/)
+- [MongoDB Atlas](https://www.mongodb.com/atlas) (Cloud Database)
+- [Render](https://render.com/) (Cloud Hosting)
+
+## Deployment
+
+The BFF is deployed as a production **Web Service on Render**, ensuring secure communication with the frontend via proper CORS policies. Database persistence is handled remotely via **MongoDB Atlas**, offering a fully managed cloud database solution.
 
 ## Installation and setup
 
