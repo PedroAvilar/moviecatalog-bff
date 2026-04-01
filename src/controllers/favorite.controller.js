@@ -1,6 +1,6 @@
 import Favorite from '../models/favorite.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import AppError from '../utils/appError.js';
+import AppError from '../utils/AppError.js';
 
 export const toggleFavorite = asyncHandler(async (req, res) => {
     const { movieId, title, poster_path, vote_average } = req.body;

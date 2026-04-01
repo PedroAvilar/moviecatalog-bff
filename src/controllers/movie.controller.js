@@ -1,7 +1,7 @@
 import tmdb from '../services/tmdb.service.js';
 import Review from '../models/review.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import AppError from '../utils/appError.js';
+import AppError from '../utils/AppError.js';
 
 export const getMovieDetails = asyncHandler(async (req, res) => {
     const { id } = req.params;

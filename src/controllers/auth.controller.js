@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import Review from '../models/review.model.js';
 import env from '../config/env.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import AppError from '../utils/appError.js';
+import AppError from '../utils/AppError.js';
 
 const cookieOptions = {
     httpOnly: true,
