@@ -9,7 +9,7 @@ const cookieOptions = {
     httpOnly: true,
     sameSite: env.isProduction ? 'none' : 'strict',
     secure: env.isProduction,
-    maxAge: 24 * 60 *60 * 1000
+    maxAge: 24 * 60 * 60 * 1000
 };
 
 export const register = asyncHandler(async (req, res) => {
@@ -46,7 +46,7 @@ export const login = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.comparePassword(password))) {
-        throw new AppError('E-mail ou senha inválidos', 401);
+        throw new AppError('E-mail ou senha incorretos', 401);
     }
 
     const token = jwt.sign(
@@ -109,10 +109,14 @@ export const updatePassword = asyncHandler(async (req, res) => {
         throw new AppError('Usuário não encontrado', 404);
     }
 
+    if (!currentPassword || !newPassword) {
+        throw new AppError('Todos os campo são obrigatórios', 400);
+    }
+
     const isMatch = await user.comparePassword(currentPassword);
 
     if (!isMatch){
-        throw new AppError('Senha atual incorreta', 401);
+        throw new AppError('Senha atual incorreta', 400);
     }
 
     user.password = newPassword;
