@@ -3,6 +3,12 @@ import jwt from 'jsonwebtoken';
 import env from '../config/env.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
+const mapUser = (user) => ({
+    id: user._id,
+    name: user.name,
+    email: user.email
+})
+
 const cookieOptions = {
     httpOnly: true,
     sameSite: env.isProduction ? 'none' : 'strict',
@@ -15,11 +21,7 @@ export const register = asyncHandler(async (req, res) => {
 
     res.status(201).json({
         message: 'Usuário criado com sucesso',
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email
-        }
+        user: mapUser(user)
     });
 });
 
@@ -36,11 +38,7 @@ export const login = asyncHandler(async (req, res) => {
 
     res.json({
         message: 'Login realizado com sucesso',
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email
-        }
+        user: mapUser(user)
     });
 });
 
@@ -49,11 +47,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
     res.json({
         message: 'Perfil atualizado com sucesso',
-        user: { 
-            id: user._id,
-            name: user.name,
-            email: user.email 
-        }
+        user: mapUser(user)
     });
 });
 
