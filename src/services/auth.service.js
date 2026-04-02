@@ -80,6 +80,12 @@ export const updateUserPassword = async (userId, { currentPassword, newPassword 
 };
 
 export const deleteUserAccount = async (userId) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError('Usuário não encontrado', 404);
+    }
+
     await Review.deleteMany({ userId });
     await User.findByIdAndDelete(userId);
-}
+};
