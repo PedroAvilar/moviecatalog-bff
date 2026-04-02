@@ -33,14 +33,14 @@ export const loginUser = async ({ email, password }) => {
 }
 
 export const updateUserProfile = async (userId, { name, email }) => {
+    if (!name || !email) {
+        throw new AppError('Todos os campos são obrigatórios', 400);
+    }
+
     const user = await User.findById(userId);
 
     if (!user) {
         throw new AppError('Usuário não encontrado', 404);
-    }
-
-    if (!name || !email) {
-        throw new AppError('Todos os campos são obrigatórios', 400);
     }
 
     user.name = name;
@@ -66,7 +66,7 @@ export const updateUserPassword = async (userId, { currentPassword, newPassword 
     }
 
     if (!currentPassword || !newPassword) {
-        throw new AppError('Todos os campo são obrigatórios', 400);
+        throw new AppError('Todos os campos são obrigatórios', 400);
     }
 
     const isMatch = await user.comparePassword(currentPassword);
