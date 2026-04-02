@@ -26,7 +26,7 @@ export const protect = asyncHandler(async (req, res, next) => {
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
-        throw new AppError('Usuário não encontrado', 401);
+        throw new AppError('Não autorizado', 401);
     }
 
     req.user = user;
