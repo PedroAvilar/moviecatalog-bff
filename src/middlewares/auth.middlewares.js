@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 import env from '../config/env.js';
+import AppError from '../utils/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
 
-export const protect = async (req, res, next) => {
+export const protect = asyncHandler(async (req, res, next) => {
     let token = req.cookies?.token;
 
     if (!token && req.headers.authorization?.startsWith('Bearer')) {
@@ -10,22 +12,24 @@ export const protect = async (req, res, next) => {
     }
 
     if (!token) {
-        return res.status(401).json({ error: 'Não autorizado, token não encontrado' });
+        throw new AppError('Não autorizado, token não encontrado', 401);
     }
+
+    let decoded;
 
     try {
-        const decoded = jwt.verify(token, env.jwtSecret);
-
-        req.user = await User.findById(decoded.id).select('-password');
-
-        if (!req.user) {
-            return res.status(401).json({ error: 'Usuário não encontrado'});
-        }
-
-        next();
-        
-    } catch (error) {
-        console.error('Erro no middleware de auth: ', error);
-        res.status(401).json({ error: 'Não autorizado, token inválido'});
+        decoded = jwt.verify(token, env.jwtSecret);
+    } catch {
+        throw new AppError('Não autorizado, token inválido', 401);
     }
-};
+
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+        throw new AppError('Usuário não encontrado', 401);
+    }
+
+    req.user = user;
+
+    next();
+});
