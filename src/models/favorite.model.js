@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const favoriteSchema = new mongoose.Schema({
     userId: {

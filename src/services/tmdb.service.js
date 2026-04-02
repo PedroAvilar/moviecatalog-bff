@@ -1,5 +1,5 @@
-import axios from "axios";
-import env from "../config/env.js";
+import axios from 'axios';
+import env from '../config/env.js';
 
 const tmdb = axios.create({
     baseURL: 'https://api.themoviedb.org/3'

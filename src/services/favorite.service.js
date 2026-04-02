@@ -14,7 +14,7 @@ export const toggleFavoriteService = async (userId, data) => {
         await Favorite.findByIdAndDelete(existing._id);
 
         return { 
-            message: "Removido dos favoritos", 
+            message: 'Removido dos favoritos', 
             isFavorite: false 
         };
     }
