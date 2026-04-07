@@ -3,10 +3,6 @@ import tmdb from './tmdb.service.js';
 import AppError from '../utils/AppError.js';
 
 export const createReviewService = async (userId, { movieId, rating, comment }) => {
-    if (!movieId || typeof rating !== 'number' || !comment) {
-        throw new AppError('Avaliação inválida', 400);
-    }
-
     try {
         await Review.create({
             movieId,
@@ -30,26 +26,29 @@ export const getMyReviewsService = async (userId) => {
             const { movieId, ...rest} = review.toJSON();
 
             try {
-                const response = await tmdb.get(`/movie/${review.movieId}`);
+                const response = await tmdb.get(`/movie/${movieId}`);
                 const movie = response.data;
                     
                 return {
                     ...rest,
                     movie: {
-                        id: review.movieId,
+                        id: movieId,
                         title: movie.title,
                         poster_path: movie.poster_path,
                         release_date: movie.release_date
                     }
                 };
             } catch (error) {
-                return {
-                    ...rest,
-                    movie: { 
-                        id: review.movieId, 
-                        title: 'Filme não encontrado'
-                    }
-                };
+                if (error.response?.status === 404) {
+                    return {
+                        ...rest,
+                        movie: {
+                            id: movieId,
+                            title: 'Filme não encontrado'
+                        }
+                    };
+                }
+                throw new AppError('Erro ao buscar dados do filme', 500);
             }
         })
     );
@@ -67,10 +66,6 @@ export const deleteReviewService = async (userId, reviewId) => {
 };
 
 export const updateReviewService = async (userId, reviewId, { rating, comment }) => {
-    if (typeof rating !== 'number' || !comment) {
-        throw new AppError('Dados insuficientes para atualização', 400);
-    }
-
     const review = await Review.findOneAndUpdate(
         { _id: reviewId, userId },
         { rating, comment },
