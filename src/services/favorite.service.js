@@ -1,12 +1,7 @@
 import Favorite from '../models/favorite.model.js';
-import AppError from '../utils/AppError.js';
 
 export const toggleFavoriteService = async (userId, data) => {
     const { movieId, title, poster_path, vote_average } = data;
-
-    if (!movieId) {
-        throw new AppError('O ID do filme é obrigatório', 400);
-    }
 
     const existing = await Favorite.findOne({ userId, movieId });
 
