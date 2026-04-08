@@ -122,7 +122,13 @@ export const discoverMoviesService = async ({ with_genres, page }) => {
                 }
             });
 
-            return response.data.results.map(mapBaseMovie);
+            const { page: currentPage, total_pages, results } = response.data;
+
+            return {
+                page: currentPage,
+                total_pages: total_pages,
+                results: results.map(mapBaseMovie)
+            };
         } catch (error) {
             throw new AppError('Erro ao filtrar filmes por gênero', 500);
         };
