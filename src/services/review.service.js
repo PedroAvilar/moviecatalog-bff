@@ -1,6 +1,7 @@
 import Review from '../models/review.model.js';
 import tmdb from './tmdb.service.js';
 import AppError from '../utils/AppError.js';
+import cache from '../config/cache.js';
 
 export const createReviewService = async (userId, { movieId, rating, comment }) => {
     try {
@@ -10,6 +11,8 @@ export const createReviewService = async (userId, { movieId, rating, comment }) 
             rating,
             comment
         });
+
+        cache.del(`movies:details:${movieId}`);
     } catch (error) {
         if (error.code === 11000) {
             throw new AppError('Você já avaliou esse filme', 400);
@@ -63,6 +66,8 @@ export const deleteReviewService = async (userId, reviewId) => {
     if (!review) {
         throw new AppError('Avaliação não encontrada ou sem permissão', 404);
     }
+
+    cache.del(`movies:details:${review.movieId}`);
 };
 
 export const updateReviewService = async (userId, reviewId, { rating, comment }) => {
@@ -75,4 +80,6 @@ export const updateReviewService = async (userId, reviewId, { rating, comment })
     if (!review) {
         throw new AppError('Avaliação não encontrada ou sem permissão', 404);
     }
+
+    cache.del(`movies:details:${review.movieId}`);
 };
