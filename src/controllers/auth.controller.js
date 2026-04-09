@@ -43,8 +43,10 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const getMe = (req, res) => {
-    res.json(mapUser(req.user));
-}
+    res.json({
+        user: mapUser(req.user)
+    });
+};
 
 export const updateProfile = asyncHandler(async (req, res) => {
     const user = await updateUserProfile(req.user.id, req.body);
