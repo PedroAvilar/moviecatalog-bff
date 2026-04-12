@@ -26,12 +26,12 @@ export const getMyReviewsService = async (userId) => {
 
     return Promise.all(
         reviews.map(async (review) => {
-            const { movieId, ...rest} = review.toJSON();
+            const { movieId, ...rest } = review.toJSON();
 
             try {
                 const response = await tmdb.get(`/movie/${movieId}`);
                 const movie = response.data;
-                    
+
                 return {
                     ...rest,
                     movie: {
