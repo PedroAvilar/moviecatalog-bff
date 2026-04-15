@@ -1,3 +1,4 @@
+import { sendError } from '../utils/sendResponse.js';
 import logger from '../config/logger.js';
 
 const errorHandler = (err, req, res, next) => {
@@ -10,9 +11,11 @@ const errorHandler = (err, req, res, next) => {
 
     const statusCode = err.statusCode || 500;
 
-    res.status(statusCode).json({
-        error: err.message || 'Erro interno do servidor'
-    });
+    sendError(
+        res,
+        err.message || 'Erro interno no servidor',
+        statusCode
+    );
 };
 
 export default errorHandler;
