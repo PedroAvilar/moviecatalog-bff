@@ -25,7 +25,7 @@ export const toggleFavoriteService = async (userId, data) => {
     return {
         message: 'Adicionado aos favoritos',
         isFavorite: true
-    }
+    };
 };
 
 export const getFavoritesService = async (userId) => {
