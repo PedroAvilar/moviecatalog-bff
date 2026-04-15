@@ -1,4 +1,5 @@
 import { registerUser, loginUser, updateUserProfile, updateUserPassword, deleteUserAccount } from '../services/auth.service.js';
+import { sendSuccess } from '../utils/sendResponse.js';
 import jwt from 'jsonwebtoken';
 import env from '../config/env.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -7,7 +8,7 @@ const mapUser = (user) => ({
     id: user._id,
     name: user.name,
     email: user.email
-})
+});
 
 const cookieOptions = {
     httpOnly: true,
@@ -19,10 +20,12 @@ const cookieOptions = {
 export const register = asyncHandler(async (req, res) => {
     const user = await registerUser(req.body);
 
-    res.status(201).json({
-        message: 'Usuário criado com sucesso',
-        user: mapUser(user)
-    });
+    return sendSuccess(
+        res,
+        { user: mapUser(user) },
+        'Usuário criado com sucesso',
+        201
+    );
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -36,31 +39,39 @@ export const login = asyncHandler(async (req, res) => {
 
     res.cookie('token', token, cookieOptions);
 
-    res.json({
-        message: 'Login realizado com sucesso',
-        user: mapUser(user)
-    });
+    return sendSuccess(
+        res,
+        { user: mapUser(user) },
+        'Login realizado com sucesso'
+    );
 });
 
 export const getMe = (req, res) => {
-    res.json({
-        user: mapUser(req.user)
-    });
+    return sendSuccess(
+        res,
+        { user: mapUser(req.user) },
+        'Usuário autenticado'
+    );
 };
 
 export const updateProfile = asyncHandler(async (req, res) => {
     const user = await updateUserProfile(req.user.id, req.body);
 
-    res.json({
-        message: 'Perfil atualizado com sucesso',
-        user: mapUser(user)
-    });
+    return sendSuccess(
+        res,
+        { user: mapUser(user) },
+        'Perfil atualizado com sucesso'
+    );
 });
 
 export const updatePassword = asyncHandler(async (req, res) => {
     await updateUserPassword(req.user.id, req.body);
 
-    res.json({ message: 'Senha atualizada com sucesso' });
+    return sendSuccess(
+        res,
+        {},
+        'Senha atualizada com sucesso'
+    );
 });
 
 export const deleteAccount = asyncHandler(async (req, res) => {
@@ -68,11 +79,19 @@ export const deleteAccount = asyncHandler(async (req, res) => {
 
     res.clearCookie('token', cookieOptions);
 
-    res.json({ message: 'Conta e avaliações excluídas com sucesso' });
+    return sendSuccess(
+        res,
+        {},
+        'Conta e avaliações excluídas com sucesso'
+    );
 });
 
 export const logout = (req, res) => {
     res.clearCookie('token', cookieOptions);
 
-    res.json({ message: 'Logout realizado com sucesso'});
+    return sendSuccess(
+        res,
+        {},
+        'Logout realizado com sucesso'
+    );
 };
