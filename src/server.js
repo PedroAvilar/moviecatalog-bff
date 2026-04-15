@@ -1,3 +1,4 @@
+import { sendSuccess, sendError } from './utils/sendResponse.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -31,8 +32,12 @@ app.use(cors({
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
-    message: {
-        error: 'Muitas tentativas, tente novamente mais tarde'
+    handler: (req, res) => {
+        sendError(
+            res,
+            'Muitas tentativas. Tente novamente mais tarde.',
+            429
+        );
     }
 });
 
@@ -49,20 +54,23 @@ app.use('/api/review', reviewRoutes);
 app.use('/api/favorite', favoriteRoutes);
 
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
-        message: 'BFF rodando corretamente'
-    })
-})
+    sendSuccess(
+        res,
+        { status: 'ok' },
+        'BFF rodando corretamente'
+    );
+});
 
 app.use((req, res) => {
-    res.status(404).json({
-        error: 'Rota não encontrada'
-    })
-})
+    sendError(
+        res,
+        'Rota não encontrada',
+        404
+    );
+});
 
 app.use(errorHandler);
 
 app.listen(env.port, () => {
     console.log(`Servidor BFF rodando em http://localhost:${env.port}`)
-})
+});
