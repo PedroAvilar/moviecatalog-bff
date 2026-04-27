@@ -41,12 +41,24 @@ O projeto segue uma arquitetura em camadas bem definida:
 - **Segurança** – Cabeçalhos HTTP seguros via `helmet` e política de CORS configurada por lista de origens permitidas.
 - **Health Check** – Endpoint `GET /health` para verificação do status do serviço.
 
+### Testes Automatizados (Quality Assurance)
+
+A qualidade e a resiliência do código são garantidas através de uma suíte abrangente de testes de integração e unitários, essencial para aplicações de nível de produção (*production-ready*).
+- **Ferramentas:** Construído utilizando **Jest** como _test runner_ e **Supertest** para asserções em requisições HTTP e simulação de rotas Express.
+- **Cobertura Estratégica:** Testes rigorosos cobrindo *Happy Paths* (casos de sucesso) e *Unhappy Paths* (cenários de erro, exceções e casos de borda).
+- **Validação de Contratos:** Testes específicos para garantir que a camada de validação (**Zod**) intercepte e trate adequadamente _payloads_ incorretos, maliciosos ou vazios (`400 Bad Request`).
+- **Isolamento e Mocks:** Uso avançado de _mocking_ (`jest.unstable_mockModule` e `jest.fn()`) para abstrair o MongoDB e as dependências externas (TMDB), garantindo testes extremamente rápidos, determinísticos e não dependentes de rede.
+- **Segurança e Performance:** Asserções cobrindo autenticação, injeção NoSQL e XSS, além de roteamento inteligente (desativando o _rate limiter_ em modo de teste para não estrangular o runner).
+- **Ambiente Padronizado com Docker:** A conteinerização garante que o ambiente de desenvolvimento e testes seja idêntico para todos no time, fortalecendo a integração contínua.
+
 ## Tecnologias
 
 - [Node.js](https://nodejs.org/)
 - [Express](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/) / [Mongoose](https://mongoosejs.com/)
 - [Zod](https://zod.dev/) (Validação de schemas)
+- [Jest](https://jestjs.io/) (Test Runner)
+- [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
 - [JWT](https://jwt.io/) / [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) (Hash de senhas)
 - [node-cache](https://github.com/node-cache/node-cache) (Cache em memória)
@@ -82,6 +94,11 @@ O BFF está implantado como um **Web Service no Render**, garantindo comunicaç�
    **Com Docker**:
    ```bash
    docker-compose up -d
+   ```
+
+4. **Executar a suíte de testes:**
+   ```bash
+   npm test
    ```
 
 > Para instruções de configuração do frontend, acesse o [Repositório do Frontend](https://github.com/pedroavilar/moviecatalog-frontend).
@@ -135,12 +152,24 @@ The project follows a well-defined layered architecture:
 - **Security** – Secure HTTP headers via `helmet` and CORS policy configured with an allowed-origins list.
 - **Health Check** – `GET /health` endpoint for service status verification.
 
+### Automated Testing (Quality Assurance)
+
+Code quality and resilience are ensured through a comprehensive suite of integration and unit tests, demonstrating production-readiness.
+- **Tools:** Built using **Jest** as the test runner and **Supertest** for HTTP request assertions and Express route simulation.
+- **Strategic Coverage:** Rigorous testing covering both *Happy Paths* (success cases) and *Unhappy Paths* (error scenarios, exceptions, and edge cases).
+- **Contract Validation:** Specific tests to ensure the validation layer (**Zod**) correctly intercepts malicious, empty, or incorrect payloads (`400 Bad Request`).
+- **Isolation and Mocks:** Advanced usage of module mocking (`jest.unstable_mockModule` and `jest.fn()`) to abstract MongoDB and external dependencies (TMDB API), ensuring fast, deterministic, and network-independent test runs.
+- **Security & Performance:** Assertions covering authentication logic, NoSQL injection, XSS prevention, and adaptive behavior (e.g., dynamically disabling rate limits in the test environment to prevent throttling).
+- **Docker-Standardized Environment:** Containerization ensures that the development and testing environments are identical across the team, strengthening continuous integration.
+
 ## Technologies
 
 - [Node.js](https://nodejs.org/)
 - [Express](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/) / [Mongoose](https://mongoosejs.com/)
 - [Zod](https://zod.dev/) (Schema validation)
+- [Jest](https://jestjs.io/) (Test Runner)
+- [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
 - [JWT](https://jwt.io/) / [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) (Password hashing)
 - [node-cache](https://github.com/node-cache/node-cache) (In-memory cache)
@@ -176,6 +205,11 @@ The BFF is deployed as a production **Web Service on Render**, ensuring secure c
    **Using Docker**:
    ```bash
    docker-compose up -d
+   ```
+
+4. **Run the test suite:**
+   ```bash
+   npm test
    ```
 
 > For frontend setup instructions, please visit the [Frontend Repository](https://github.com/pedroavilar/moviecatalog-frontend).
