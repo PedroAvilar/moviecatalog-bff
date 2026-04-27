@@ -1,9 +1,15 @@
 import pino from 'pino';
 import env from './env.js';
 
+const isTest = process.env.NODE_ENV === 'test';
+
 const logger = pino({
-    level: env.isProduction ? 'info' : 'debug',
-    transport: env.isProduction
+    level: isTest
+        ? 'silent'
+        : env.isProduction
+            ? 'info'
+            : 'debug',
+    transport: env.isProduction || isTest
         ? undefined
         : {
             target: 'pino-pretty',
