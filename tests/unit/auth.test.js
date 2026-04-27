@@ -11,19 +11,19 @@ const mockReview = {
     deleteMany: jest.fn(),
 };
 
-jest.unstable_mockModule('../src/models/review.model.js', () => ({
+jest.unstable_mockModule('../../src/models/review.model.js', () => ({
     default: mockReview,
 }));
 
-jest.unstable_mockModule('../src/models/user.model.js', () => ({
+jest.unstable_mockModule('../../src/models/user.model.js', () => ({
     default: mockUser,
 }));
 
-const { default: app } = await import('../src/app.js');
+const { default: app } = await import('../../src/app.js');
 
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import env from '../src/config/env.js';
+import env from '../../src/config/env.js';
 
 describe('Auth Routes', () => {
     beforeEach(() => {

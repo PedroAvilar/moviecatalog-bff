@@ -9,19 +9,19 @@ const mockReview = {
     populate: jest.fn()
 };
 
-jest.unstable_mockModule('../src/utils/cacheHelper.js', () => ({
+jest.unstable_mockModule('../../src/utils/cacheHelper.js', () => ({
     caching: jest.fn((key, ttl, fn) => fn()), 
 }));
 
-jest.unstable_mockModule('../src/services/tmdb.service.js', () => ({
+jest.unstable_mockModule('../../src/services/tmdb.service.js', () => ({
     default: mockTmdb,
 }));
 
-jest.unstable_mockModule('../src/models/review.model.js', () => ({
+jest.unstable_mockModule('../../src/models/review.model.js', () => ({
     default: mockReview,
 }));
 
-const { default: app } = await import('../src/app.js');
+const { default: app } = await import('../../src/app.js');
 
 import request from 'supertest';
 

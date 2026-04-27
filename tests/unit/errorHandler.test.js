@@ -6,15 +6,15 @@ const mockLogger = {
 
 const mockSendError = jest.fn();
 
-jest.unstable_mockModule('../src/config/logger.js', () => ({
+jest.unstable_mockModule('../../src/config/logger.js', () => ({
     default: mockLogger
 }));
 
-jest.unstable_mockModule('../src/utils/sendResponse.js', () => ({
+jest.unstable_mockModule('../../src/utils/sendResponse.js', () => ({
     sendError: mockSendError
 }));
 
-const { default: errorHandler } = await import('../src/middlewares/errorHandler.js');
+const { default: errorHandler } = await import('../../src/middlewares/errorHandler.js');
 
 describe('ErrorHandler Middleware', () => {
     let req, res, next;

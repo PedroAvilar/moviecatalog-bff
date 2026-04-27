@@ -19,27 +19,27 @@ const mockUser = {
     findById: jest.fn(),
 };
 
-jest.unstable_mockModule('../src/models/review.model.js', () => ({
+jest.unstable_mockModule('../../src/models/review.model.js', () => ({
     default: mockReview,
 }));
 
-jest.unstable_mockModule('../src/services/tmdb.service.js', () => ({
+jest.unstable_mockModule('../../src/services/tmdb.service.js', () => ({
     default: mockTmdb,
 }));
 
-jest.unstable_mockModule('../src/config/cache.js', () => ({
+jest.unstable_mockModule('../../src/config/cache.js', () => ({
     default: mockCache,
 }));
 
-jest.unstable_mockModule('../src/models/user.model.js', () => ({
+jest.unstable_mockModule('../../src/models/user.model.js', () => ({
     default: mockUser,
 }));
 
-const { default: app } = await import('../src/app.js');
+const { default: app } = await import('../../src/app.js');
 
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import env from '../src/config/env.js';
+import env from '../../src/config/env.js';
 
 describe('Review Routes', () => {
     const token = jwt.sign({ id: 'user123' }, env.jwtSecret);

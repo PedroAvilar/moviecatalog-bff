@@ -1,5 +1,5 @@
 import { expect, jest } from '@jest/globals';
-import sanitizeInput from '../src/middlewares/sanitizeInput.js';
+import sanitizeInput from '../../src/middlewares/sanitizeInput.js';
 
 describe('sanitizeInput Middleware', () => {
     let req, res, next;

@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { z } from 'zod';
-import validateRequest from '../src/middlewares/validateRequest.js';
-import AppError from '../src/utils/AppError.js';
+import validateRequest from '../../src/middlewares/validateRequest.js';
+import AppError from '../../src/utils/AppError.js';
 
 describe('validateRequest Middleware', () => {
     let mockReq, mockRes, next;
