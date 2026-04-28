@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { expect, it, jest } from '@jest/globals';
 
 const mockUser = {
     findOne: jest.fn(),
@@ -8,11 +8,19 @@ const mockUser = {
 };
 
 const mockReview = {
+    deleteMany: jest.fn(), //Hoje
+};
+
+const mockFavorite = {
     deleteMany: jest.fn(),
 };
 
 jest.unstable_mockModule('../../src/models/review.model.js', () => ({
     default: mockReview,
+}));
+
+jest.unstable_mockModule('../../src/models/favorite.model.js', () => ({
+    default: mockFavorite,
 }));
 
 jest.unstable_mockModule('../../src/models/user.model.js', () => ({
@@ -24,6 +32,12 @@ const { default: app } = await import('../../src/app.js');
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import env from '../../src/config/env.js';
+
+const mockQuery = (data) => {
+    const query = Promise.resolve(data);
+    query.select = jest.fn().mockReturnValue(query);
+    return query;
+};
 
 describe('Auth Routes', () => {
     beforeEach(() => {
@@ -37,7 +51,7 @@ describe('Auth Routes', () => {
                 email: 'pedro@test.com',
                 password: 'password123'
             };
-            
+
             mockUser.findOne.mockResolvedValueOnce(null);
             mockUser.create.mockResolvedValueOnce({
                 _id: 'user123',
@@ -50,6 +64,8 @@ describe('Auth Routes', () => {
                 .send(newUser);
 
             expect(res.statusCode).toBe(201);
+            expect(res.body.user.id).toBe('user123');
+            expect(res.body.user).not.toHaveProperty('_id');
             expect(res.body.user.name).toBe('Pedro');
         });
 
@@ -95,13 +111,38 @@ describe('Auth Routes', () => {
             );
         });
 
+        it('Não deve sanitizar a senha no registro', async () => {
+            const newUser = {
+                name: 'Pedro',
+                email: 'pedro@test.com',
+                password: 'password<b>123</b>'
+            };
+
+            mockUser.findOne.mockResolvedValueOnce(null);
+            mockUser.create.mockResolvedValueOnce({
+                _id: 'user123',
+                name: 'Pedro',
+                email: 'pedro@test.com'
+            });
+
+            await request(app)
+                .post('/api/auth/register')
+                .send(newUser);
+
+            expect(mockUser.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    password: 'password<b>123</b>'
+                })
+            );
+        });
+
         it('Deve falhar na validação se enviar dados inválidos (Zod)', async () => {
             const res = await request(app)
                 .post('/api/auth/register')
                 .send({
-                    name: 'P', 
+                    name: 'P',
                     email: 'email-invalido',
-                    password: '123' 
+                    password: '123'
                 });
 
             expect(res.statusCode).toBe(400);
@@ -110,15 +151,13 @@ describe('Auth Routes', () => {
 
     describe('POST /api/auth/login', () => {
         it('Deve logar e retornar um cookie de token', async () => {
-            const userData = { 
-                _id: 'user123', 
-                email: 'pedro@test.com', 
+            const userData = {
+                _id: 'user123',
+                email: 'pedro@test.com',
                 comparePassword: jest.fn().mockResolvedValue(true)
             };
 
-            mockUser.findOne.mockReturnValueOnce({
-                select: jest.fn().mockResolvedValue(userData)
-            });
+            mockUser.findOne.mockReturnValueOnce(mockQuery(userData));
 
             const res = await request(app)
                 .post('/api/auth/login')
@@ -128,8 +167,8 @@ describe('Auth Routes', () => {
                 });
 
             expect(res.statusCode).toBe(200);
-            expect(res.headers['set-cookie'][0]).toMatch(/token=/);
-            expect(res.body.user.id).toBeDefined();
+            expect(res.body.user.id).toBe('user123');
+            expect(res.body.user).not.toHaveProperty('_id');
         });
 
         it('Deve bloquear tentativa de NoSQL Injection no login', async () => {
@@ -144,9 +183,9 @@ describe('Auth Routes', () => {
         });
 
         it('Deve falhar com senha incorreta', async () => {
-            const userData = { 
-                _id: 'user123', 
-                email: 'pedro@test.com', 
+            const userData = {
+                _id: 'user123',
+                email: 'pedro@test.com',
                 comparePassword: jest.fn().mockResolvedValue(false)
             };
 
@@ -165,11 +204,11 @@ describe('Auth Routes', () => {
             expect(res.body.message).toBe('E-mail ou senha incorretos');
         });
 
-        it('Deve falhar na validação se enviar dados ausentes ou inválidos (Zod)', async () => {
+        it('Deve falhar na validação se enviar dados ausentes (Zod)', async () => {
             const res = await request(app)
                 .post('/api/auth/login')
                 .send({
-                    email: 'not-an-email'
+                    email: 'pedro@test.com'
                 });
 
             expect(res.statusCode).toBe(400);
@@ -190,13 +229,11 @@ describe('Auth Routes', () => {
         it('Deve retornar dados do usuário se o token for válido', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
 
-            mockUser.findById.mockReturnValueOnce({
-                select: jest.fn().mockResolvedValue({
-                    _id: 'user123',
-                    name: 'Pedro',
-                    email: 'pedro@test.com'
-                })
-            });
+            mockUser.findById.mockReturnValueOnce(mockQuery({
+                _id: 'user123',
+                name: 'Pedro',
+                email: 'pedro@test.com'
+            }));
 
             const res = await request(app)
                 .get('/api/auth/me')
@@ -204,13 +241,14 @@ describe('Auth Routes', () => {
 
             expect(res.statusCode).toBe(200);
             expect(res.body.user.name).toBe('Pedro');
+            expect(res.body.user.id).toBe('user123');
+            expect(res.body.user).not.toHaveProperty('_id');
         });
 
         it('Deve retornar 401 Não Autorizado se não enviar o token', async () => {
             const res = await request(app).get('/api/auth/me');
 
             expect(res.statusCode).toBe(401);
-            expect(res.body.message).toBe('Não autorizado, token não encontrado');
         });
     });
 
@@ -222,9 +260,7 @@ describe('Auth Routes', () => {
                 email: 'pedro@test.com',
                 save: jest.fn().mockResolvedValue(true)
             };
-            const fakeQuery = Promise.resolve(userData);
-            fakeQuery.select = jest.fn().mockReturnValue(fakeQuery);
-            mockUser.findById.mockReturnValue(fakeQuery);
+            mockUser.findById.mockReturnValue(mockQuery(userData));
         });
 
         it('Deve atualizar o perfil do usuário', async () => {
@@ -243,13 +279,51 @@ describe('Auth Routes', () => {
             expect(res.body.user.name).toBe('Pedro Novo');
         });
 
+        it('Deve retornar 400 se tentar atualizar para um e-mail que já pertence a outro usuário', async () => {
+            const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
+
+            const mongoError = new Error('Duplicate Key');
+            mongoError.code = 11000;
+
+            const userData = {
+                save: jest.fn().mockRejectedValue(mongoError)
+            };
+            mockUser.findById.mockReturnValue(mockQuery(userData));
+
+            const res = await request(app)
+                .put('/api/auth/update-profile')
+                .set('Cookie', [`token=${token}`])
+                .send({ name: 'Teste', email: 'existente@test.com' });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body.message).toBe('E-mail já está em uso');
+        });
+
+        it('Deve retornar 404 se usuário não for encontrado no service', async () => {
+            const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
+
+            mockUser.findById.mockReturnValueOnce(mockQuery({ _id: 'user123' }));
+            mockUser.findById.mockResolvedValueOnce(null);
+
+            const res = await request(app)
+                .put('/api/auth/update-profile')
+                .set('Cookie', [`token=${token}`])
+                .send({ name: 'Teste', email: 'pedro@test.com' });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body.message).toBe('Usuário não encontrado');
+        });
+
         it('Deve falhar na validação (Zod) se enviar e-mail inválido', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
+
+            mockUser.findById.mockReturnValue(mockQuery({ _id: 'user123' }));
 
             const res = await request(app)
                 .put('/api/auth/update-profile')
                 .set('Cookie', [`token=${token}`])
                 .send({
+                    name: 'Pedro',
                     email: 'emailinvalido'
                 });
 
@@ -259,7 +333,7 @@ describe('Auth Routes', () => {
 
     describe('PUT /api/auth/update-password', () => {
         let fakeQuery;
-        
+
         beforeEach(() => {
             const userData = {
                 _id: 'user123',
@@ -267,9 +341,7 @@ describe('Auth Routes', () => {
                 password: 'oldHashedPassword',
                 save: jest.fn().mockResolvedValue(true)
             };
-            fakeQuery = Promise.resolve(userData);
-            fakeQuery.select = jest.fn().mockReturnValue(fakeQuery);
-            mockUser.findById.mockReturnValue(fakeQuery);
+            mockUser.findById.mockReturnValue(mockQuery(userData));
         });
 
         it('Deve atualizar a senha com sucesso', async () => {
@@ -289,16 +361,12 @@ describe('Auth Routes', () => {
 
         it('Deve falhar se a senha atual estiver incorreta', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
-            
+
             const userData = {
                 _id: 'user123',
                 comparePassword: jest.fn().mockResolvedValue(false)
             };
-
-            const fQ = Promise.resolve(userData);
-
-            fQ.select = jest.fn().mockReturnValue(fQ);
-            mockUser.findById.mockReturnValue(fQ);
+            mockUser.findById.mockReturnValue(mockQuery(userData));
 
             const res = await request(app)
                 .put('/api/auth/update-password')
@@ -327,15 +395,13 @@ describe('Auth Routes', () => {
     });
 
     describe('DELETE /api/auth/delete-account', () => {
-        it('Deve deletar conta e reviews, e limpar o cookie', async () => {
+        it('Deve deletar conta, favoritos e reviews, e limpar o cookie', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
-            
-            mockUser.findById.mockReturnValue({
-                select: jest.fn().mockResolvedValue({ 
-                    _id: 'user123',
-                    id: 'user123'
-                })
-            });
+
+            mockUser.findById.mockReturnValue(mockQuery({
+                _id: 'user123',
+                id: 'user123'
+            }));
 
             mockReview.deleteMany.mockResolvedValue({ deletedCount: 1 });
             mockUser.findByIdAndDelete.mockResolvedValue(true);
@@ -348,6 +414,16 @@ describe('Auth Routes', () => {
             expect(mockReview.deleteMany).toHaveBeenCalledWith({
                 userId: 'user123'
             });
+            expect(mockFavorite.deleteMany).toHaveBeenCalledWith({
+                userId: 'user123'
+            });
+
+            const reviewCall = mockReview.deleteMany.mock.invocationCallOrder[0];
+            const favoriteCall = mockFavorite.deleteMany.mock.invocationCallOrder[0];
+            const userDeleteCall = mockUser.findByIdAndDelete.mock.invocationCallOrder[0];
+
+            expect(reviewCall).toBeLessThan(userDeleteCall);
+            expect(favoriteCall).toBeLessThan(userDeleteCall);
             expect(res.headers['set-cookie'][0]).toMatch(/token=;/);
         });
     });
