@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import Review from '../models/review.model.js';
+import Favorite from '../models/favorite.model.js';
 import AppError from '../utils/AppError.js';
 
 export const registerUser = async ({ name, email, password }) => {
@@ -71,5 +72,6 @@ export const deleteUserAccount = async (userId) => {
     }
 
     await Review.deleteMany({ userId });
+    await Favorite.deleteMany({ userId });
     await User.findByIdAndDelete(userId);
 };
