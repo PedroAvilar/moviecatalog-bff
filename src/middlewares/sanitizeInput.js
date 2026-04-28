@@ -15,6 +15,11 @@ const sanitizeObject = (obj) => {
     for (const key in obj) {
         if (key.startsWith('$') || key.includes('.')) continue;
         
+        if (key === 'password') {
+            sanitized[key] = obj[key];
+            continue;
+        }
+        
         const value = obj[key];
 
         if (typeof value === 'string') {
