@@ -29,15 +29,10 @@ jest.unstable_mockModule('../../src/models/user.model.js', () => ({
 
 const { default: app } = await import('../../src/app.js');
 
+import { mockMongooseQuery } from '../utils/testUtils.js';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import env from '../../src/config/env.js';
-
-const mockQuery = (data) => {
-    const query = Promise.resolve(data);
-    query.select = jest.fn().mockReturnValue(query);
-    return query;
-};
 
 describe('Auth Routes', () => {
     beforeEach(() => {
@@ -157,7 +152,7 @@ describe('Auth Routes', () => {
                 comparePassword: jest.fn().mockResolvedValue(true)
             };
 
-            mockUser.findOne.mockReturnValueOnce(mockQuery(userData));
+            mockUser.findOne.mockReturnValueOnce(mockMongooseQuery(userData));
 
             const res = await request(app)
                 .post('/api/auth/login')
@@ -229,7 +224,7 @@ describe('Auth Routes', () => {
         it('Deve retornar dados do usuário se o token for válido', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
 
-            mockUser.findById.mockReturnValueOnce(mockQuery({
+            mockUser.findById.mockReturnValueOnce(mockMongooseQuery({
                 _id: 'user123',
                 name: 'Pedro',
                 email: 'pedro@test.com'
@@ -260,7 +255,7 @@ describe('Auth Routes', () => {
                 email: 'pedro@test.com',
                 save: jest.fn().mockResolvedValue(true)
             };
-            mockUser.findById.mockReturnValue(mockQuery(userData));
+            mockUser.findById.mockReturnValue(mockMongooseQuery(userData));
         });
 
         it('Deve atualizar o perfil do usuário', async () => {
@@ -288,7 +283,7 @@ describe('Auth Routes', () => {
             const userData = {
                 save: jest.fn().mockRejectedValue(mongoError)
             };
-            mockUser.findById.mockReturnValue(mockQuery(userData));
+            mockUser.findById.mockReturnValue(mockMongooseQuery(userData));
 
             const res = await request(app)
                 .put('/api/auth/update-profile')
@@ -302,7 +297,7 @@ describe('Auth Routes', () => {
         it('Deve retornar 404 se usuário não for encontrado no service', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
 
-            mockUser.findById.mockReturnValueOnce(mockQuery({ _id: 'user123' }));
+            mockUser.findById.mockReturnValueOnce(mockMongooseQuery({ _id: 'user123' }));
             mockUser.findById.mockResolvedValueOnce(null);
 
             const res = await request(app)
@@ -317,7 +312,7 @@ describe('Auth Routes', () => {
         it('Deve falhar na validação (Zod) se enviar e-mail inválido', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
 
-            mockUser.findById.mockReturnValue(mockQuery({ _id: 'user123' }));
+            mockUser.findById.mockReturnValue(mockMongooseQuery({ _id: 'user123' }));
 
             const res = await request(app)
                 .put('/api/auth/update-profile')
@@ -341,7 +336,7 @@ describe('Auth Routes', () => {
                 password: 'oldHashedPassword',
                 save: jest.fn().mockResolvedValue(true)
             };
-            mockUser.findById.mockReturnValue(mockQuery(userData));
+            mockUser.findById.mockReturnValue(mockMongooseQuery(userData));
         });
 
         it('Deve atualizar a senha com sucesso', async () => {
@@ -366,7 +361,7 @@ describe('Auth Routes', () => {
                 _id: 'user123',
                 comparePassword: jest.fn().mockResolvedValue(false)
             };
-            mockUser.findById.mockReturnValue(mockQuery(userData));
+            mockUser.findById.mockReturnValue(mockMongooseQuery(userData));
 
             const res = await request(app)
                 .put('/api/auth/update-password')
@@ -398,7 +393,7 @@ describe('Auth Routes', () => {
         it('Deve deletar conta, favoritos e reviews, e limpar o cookie', async () => {
             const token = jwt.sign({ id: 'user123' }, env.jwtSecret);
 
-            mockUser.findById.mockReturnValue(mockQuery({
+            mockUser.findById.mockReturnValue(mockMongooseQuery({
                 _id: 'user123',
                 id: 'user123'
             }));
