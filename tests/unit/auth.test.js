@@ -8,7 +8,7 @@ const mockUser = {
 };
 
 const mockReview = {
-    deleteMany: jest.fn(), //Hoje
+    deleteMany: jest.fn(),
 };
 
 const mockFavorite = {
