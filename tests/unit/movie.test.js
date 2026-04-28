@@ -36,10 +36,10 @@ describe('Movie Routes', () => {
                 data: {
                     results: [
                         { 
-                            id: 1,
-                            title: 'Filme teste',
+                            id: 550,
+                            title: 'Filme A',
                             vote_average: 7.5,
-                            poster_path: '/caminho.jpg',
+                            poster_path: '/path.jpg',
                             backdrop_path: '/fundo.jpg',
                             overview: 'Resumo'
                         }
@@ -72,10 +72,10 @@ describe('Movie Routes', () => {
                 data: {
                     results: [
                         { 
-                            id: 2,
-                            title: 'Filme Top',
+                            id: 551,
+                            title: 'Filme B',
                             vote_average: 9.5,
-                            poster_path: '/caminho2.jpg'
+                            poster_path: '/path2.jpg'
                         }
                     ]
                 }
@@ -86,7 +86,7 @@ describe('Movie Routes', () => {
 
             expect(res.statusCode).toBe(200);
             expect(res.body).toBeInstanceOf(Array);
-            expect(res.body[0]).toHaveProperty('title', 'Filme Top');
+            expect(res.body[0]).toHaveProperty('title', 'Filme B');
         });
 
         it('Deve retornar erro 500 se o TMDB falhar', async () => {
@@ -119,7 +119,7 @@ describe('Movie Routes', () => {
 
     describe('GET /api/movie/:id/details', () => {
         it('Deve retornar detalhes do filme e reviews mockados', async () => {
-            const movieId = '123';
+            const movieId = '550';
             
             mockTmdb.get.mockImplementation((url) => {
                 if (url.includes('credits')) return Promise.resolve({ 
@@ -131,8 +131,8 @@ describe('Movie Routes', () => {
 
                 return Promise.resolve({
                     data: {
-                        id: 123,
-                        title: 'Detalhe',
+                        id: 550,
+                        title: 'Filme A',
                         genres: []
                     }
                 });
@@ -150,7 +150,7 @@ describe('Movie Routes', () => {
             const res = await request(app).get(`/api/movie/${movieId}/details`);
 
             expect(res.statusCode).toBe(200);
-            expect(res.body.title).toBe('Detalhe');
+            expect(res.body.title).toBe('Filme A');
             expect(res.body.reviews[0].content).toBe('Ótimo filme!');
         });
 
@@ -175,7 +175,7 @@ describe('Movie Routes', () => {
                 data: {
                     page: 1,
                     total_pages: 5,
-                    results: [{ id: 10, title: 'Disco' }]
+                    results: [{ id: 10, title: 'Ação' }]
                 }
             });
 
@@ -184,7 +184,7 @@ describe('Movie Routes', () => {
             expect(res.statusCode).toBe(200);
             expect(res.body.page).toBe(1);
             expect(res.body.total_pages).toBe(5);
-            expect(res.body.results[0].title).toBe('Disco');
+            expect(res.body.results[0].title).toBe('Ação');
         });
     });
 });

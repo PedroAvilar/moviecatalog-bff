@@ -119,7 +119,7 @@ describe('Review Routes', () => {
                 movieId: 550,
                 rating: 9,
                 comment: 'ok',
-                $where: 'malicious'
+                $where: 'malicioso'
             };
 
             mockReview.create.mockResolvedValue(reviewData);
@@ -145,7 +145,7 @@ describe('Review Routes', () => {
     });
 
     describe('GET /api/review/me', () => {
-        it('Deve retornar as reviews do usuário com os dados do filme acoplados', async () => {
+        it('Deve retornar as avaliações do usuário com os dados do filme acoplados', async () => {
             const mockDbReviews = [
                 { 
                     movieId: 550,
@@ -165,8 +165,8 @@ describe('Review Routes', () => {
 
             mockTmdb.get.mockResolvedValue({
                 data: {
-                    title: 'Fight Club',
-                    poster_path: '/abc.jpg',
+                    title: 'Filme A',
+                    poster_path: '/path.jpg',
                     release_date: '1999-10-15'
                 }
             });
@@ -176,13 +176,13 @@ describe('Review Routes', () => {
                 .set('Cookie', [`token=${token}`]);
 
             expect(res.statusCode).toBe(200);
-            expect(res.body[0].movie.title).toBe('Fight Club');
+            expect(res.body[0].movie.title).toBe('Filme A');
             expect(res.body[0].rating).toBe(10);
         });
     });
 
     describe('DELETE /api/review/:id', () => {
-        it('Deve remover a review e limpar o cache', async () => {
+        it('Deve remover a avaliação e limpar o cache', async () => {
             mockReview.findOneAndDelete.mockResolvedValue({
                 _id: 'rev123',
                 movieId: 550
@@ -196,7 +196,7 @@ describe('Review Routes', () => {
             expect(mockCache.del).toHaveBeenCalledWith('movies:details:550');
         });
 
-        it('Deve dar 404 se a review não existir ou não for do usuário', async () => {
+        it('Deve dar 404 se a avaliação não existir ou não for do usuário', async () => {
             mockReview.findOneAndDelete.mockResolvedValue(null);
 
             const res = await request(app)
@@ -209,7 +209,7 @@ describe('Review Routes', () => {
     });
 
     describe('PUT /api/review/:id', () => {
-        it('Deve atualizar a review com sucesso', async () => {
+        it('Deve atualizar a avaliação com sucesso', async () => {
             mockReview.findOneAndUpdate.mockResolvedValue({
                 _id: 'rev123',
                 movieId: 550,
@@ -227,7 +227,7 @@ describe('Review Routes', () => {
             expect(mockCache.del).toHaveBeenCalledWith('movies:details:550');
         });
 
-        it('Deve dar 404 se a review não for encontrada ou for de outro usuário', async () => {
+        it('Deve dar 404 se a avaliação não for encontrada ou for de outro usuário', async () => {
             mockReview.findOneAndUpdate.mockResolvedValue(null);
 
             const res = await request(app)
