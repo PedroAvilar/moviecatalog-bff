@@ -47,8 +47,9 @@ A qualidade e a resiliência do código são garantidas através de uma suíte a
 - **Ferramentas:** Construído utilizando **Jest** como _test runner_ e **Supertest** para asserções em requisições HTTP e simulação de rotas Express.
 - **Cobertura Estratégica:** Testes rigorosos cobrindo *Happy Paths* (casos de sucesso) e *Unhappy Paths* (cenários de erro, exceções e casos de borda).
 - **Validação de Contratos:** Testes específicos para garantir que a camada de validação (**Zod**) intercepte e trate adequadamente _payloads_ incorretos, maliciosos ou vazios (`400 Bad Request`).
-- **Isolamento e Mocks:** Uso avançado de _mocking_ (`jest.unstable_mockModule` e `jest.fn()`) para abstrair o MongoDB e as dependências externas (TMDB), garantindo testes extremamente rápidos, determinísticos e não dependentes de rede.
-- **Segurança e Performance:** Asserções cobrindo autenticação, injeção NoSQL e XSS, além de roteamento inteligente (desativando o _rate limiter_ em modo de teste para não estrangular o runner).
+- **Isolamento e Mocks:** Uso avançado de _mocking_ (`jest.unstable_mockModule` e `jest.fn()`) para abstrair dependências externas (TMDB), garantindo testes rápidos e determinísticos.
+- **Banco de Dados em Memória:** Integração com **mongodb-memory-server** para testes de integração reais, permitindo validar persistência, consultas complexas e exclusões em cascata sem a necessidade de um banco de dados externo ou _mocks_ de modelos.
+- **Segurança, Performance e Cache:** Asserções cobrindo autenticação, injeção NoSQL e XSS, além de testes dedicados para o sistema de **cache em memória**, garantindo que as APIs externas sejam consumidas de forma eficiente.
 - **Ambiente Padronizado com Docker:** A conteinerização garante que o ambiente de desenvolvimento e testes seja idêntico para todos no time, fortalecendo a integração contínua.
 
 ## Tecnologias
@@ -59,6 +60,7 @@ A qualidade e a resiliência do código são garantidas através de uma suíte a
 - [Zod](https://zod.dev/) (Validação de schemas)
 - [Jest](https://jestjs.io/) (Test Runner)
 - [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
+- [mongodb-memory-server](https://github.com/nodkz/mongodb-memory-server) (Banco de dados em memória para testes)
 - [JWT](https://jwt.io/) / [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) (Hash de senhas)
 - [node-cache](https://github.com/node-cache/node-cache) (Cache em memória)
@@ -158,8 +160,9 @@ Code quality and resilience are ensured through a comprehensive suite of integra
 - **Tools:** Built using **Jest** as the test runner and **Supertest** for HTTP request assertions and Express route simulation.
 - **Strategic Coverage:** Rigorous testing covering both *Happy Paths* (success cases) and *Unhappy Paths* (error scenarios, exceptions, and edge cases).
 - **Contract Validation:** Specific tests to ensure the validation layer (**Zod**) correctly intercepts malicious, empty, or incorrect payloads (`400 Bad Request`).
-- **Isolation and Mocks:** Advanced usage of module mocking (`jest.unstable_mockModule` and `jest.fn()`) to abstract MongoDB and external dependencies (TMDB API), ensuring fast, deterministic, and network-independent test runs.
-- **Security & Performance:** Assertions covering authentication logic, NoSQL injection, XSS prevention, and adaptive behavior (e.g., dynamically disabling rate limits in the test environment to prevent throttling).
+- **Isolation and Mocks:** Advanced usage of module mocking (`jest.unstable_mockModule` and `jest.fn()`) to abstract external dependencies (TMDB API), ensuring fast and deterministic test runs.
+- **In-Memory Database:** Integration with **mongodb-memory-server** for real integration tests, allowing validation of persistence, complex queries, and cascade deletions without the need for an external database or model mocks.
+- **Security, Performance & Caching:** Assertions covering authentication logic, NoSQL injection, XSS prevention, and dedicated tests for the **in-memory caching system**, ensuring efficient external API consumption.
 - **Docker-Standardized Environment:** Containerization ensures that the development and testing environments are identical across the team, strengthening continuous integration.
 
 ## Technologies
@@ -170,6 +173,7 @@ Code quality and resilience are ensured through a comprehensive suite of integra
 - [Zod](https://zod.dev/) (Schema validation)
 - [Jest](https://jestjs.io/) (Test Runner)
 - [Supertest](https://github.com/ladjs/supertest) (HTTP Assertions)
+- [mongodb-memory-server](https://github.com/nodkz/mongodb-memory-server) (In-memory database for testing)
 - [JWT](https://jwt.io/) / [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) (Password hashing)
 - [node-cache](https://github.com/node-cache/node-cache) (In-memory cache)
